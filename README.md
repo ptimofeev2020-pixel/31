@@ -1,40 +1,23 @@
-# LMS — 30.2 Сериализаторы
+# LMS — 31 Права доступа в DRF
 
-Продолжение LMS-проекта на Django REST Framework: вычисляемые и вложенные поля
-в сериализаторах, модель платежей, фильтрация.
+## Что добавлено
+- JWT-авторизация (simplejwt), все эндпоинты закрыты `IsAuthenticated`
+- Регистрация `POST /register/`, вход `POST /login/` (access/refresh), обновление токена `POST /token/refresh/` — доступны без авторизации
+- CRUD пользователей `/users/`: смотреть можно любой профиль (чужой — без пароля, фамилии и платежей), редактировать/удалять — только свой
+- Поле `owner` у курса и урока, заполняется текущим пользователем при создании
+- Группа `moderators` (фикстура `users/fixtures/groups.json`): может смотреть и редактировать любые курсы/уроки, но не создавать и не удалять
+- Обычный пользователь видит, редактирует и удаляет только свои курсы и уроки
 
-## Стек
-
-- Python, Django 5.2
-- Django REST Framework
-- django-filter
-- SQLite
-
-## Что добавлено в 30.2
-
-- В сериализатор курса добавлено поле `lesson_count` (через `SerializerMethodField`)
-- В сериализатор курса добавлен вывод уроков вложенным сериализатором (`lessons`)
-- Модель `Payment` (пользователь, дата оплаты, оплаченный курс/урок, сумма, способ оплаты)
-- Фикстура `users/fixtures/payments.json` с тестовыми данными
-- Эндпоинт списка платежей с фильтрацией и сортировкой
-
-## Установка и запуск
-
+## Запуск
 ```
-python -m venv venv
-venv\Scripts\activate
 pip install -r requirements.txt
 python manage.py migrate
+python manage.py loaddata groups.json
 python manage.py loaddata payments.json
+python manage.py createsuperuser
 python manage.py runserver
 ```
+Модератора назначают через админку: добавить пользователя в группу `moderators`.
 
-## Эндпоинты
-
-- `GET /courses/<id>/` — курс с `lesson_count` и вложенными уроками
-- `GET /payments/` — список платежей, поддерживает:
-  - сортировку по дате: `?ordering=payment_date` / `?ordering=-payment_date`
-  - фильтр по курсу: `?paid_course=<id>`
-  - фильтр по уроку: `?paid_lesson=<id>`
-  - фильтр по способу оплаты: `?payment_method=cash` / `?payment_method=transfer`
-- `GET /users/<id>/` — профиль с историей платежей
+## Эндпоинты уроков
+- `GET /lessons/`, `POST /lessons/create/`, `GET /lessons/<id>/`, `PUT|PATCH /lessons/<id>/update/`, `DELETE /lessons/<id>/delete/`

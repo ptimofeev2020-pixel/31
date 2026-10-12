@@ -6,7 +6,8 @@ from lms.models import Course, Lesson
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ['id', 'name', 'description', 'preview', 'video_url', 'course']
+        fields = ['id', 'name', 'description', 'preview', 'video_url', 'course', 'owner']
+        read_only_fields = ['owner']
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -15,7 +16,8 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'name', 'preview', 'description', 'lesson_count', 'lessons']
+        fields = ['id', 'name', 'preview', 'description', 'owner', 'lesson_count', 'lessons']
+        read_only_fields = ['owner']
 
     def get_lesson_count(self, obj):
         return obj.lessons.count()
